@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * <p>Provides access to the keys and tables in a TOML data source.</p>
@@ -40,10 +39,8 @@ import com.google.gson.JsonElement;
  *
  */
 public class Toml {
-  
-  private static final Gson DEFAULT_GSON = new Gson();
 
-  private Map<String, Object> values = new HashMap<String, Object>();
+  private Map<String, Object> values;
   private final Toml defaults;
 
   /**
@@ -57,7 +54,7 @@ public class Toml {
    * @param defaults fallback values used when the requested key or table is not present in the TOML source that has been read.
    */
   public Toml(Toml defaults) {
-    this(defaults, new HashMap<String, Object>());
+    this(defaults, new HashMap<>());
   }
 
   /**
@@ -313,14 +310,8 @@ public class Toml {
    * @param <T> type of targetClass.
    * @return A new instance of targetClass.
    */
-  public <T> T to(Class<T> targetClass) {
-    JsonElement json = DEFAULT_GSON.toJsonTree(toMap());
-    
-    if (targetClass == JsonElement.class) {
-      return targetClass.cast(json);
-    }
-    
-    return DEFAULT_GSON.fromJson(json, targetClass);
+  public <T> T to(ObjectMapper mapper, Class<T> targetClass) {
+    return mapper.convertValue(toMap(), targetClass);
   }
 
   public Map<String, Object> toMap() {

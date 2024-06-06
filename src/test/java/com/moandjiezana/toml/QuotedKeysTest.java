@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 public class QuotedKeysTest {
@@ -45,7 +46,7 @@ public class QuotedKeysTest {
     Toml toml = new Toml().read("[dog.\"tater.man\"]  \n  type = \"pug0\"  \n[dog.tater]  \n  type = \"pug1\"\n[dog.tater.man]  \n  type = \"pug2\"");
     Toml dogs = toml.getTable("dog");
     
-    Map<String, Map<String, Object>> map = dogs.to(Map.class);
+    Map<String, Map<String, Object>> map = dogs.to(new ObjectMapper(), Map.class);
     
     assertEquals("pug0", map.get("\"tater.man\"").get("type"));
     assertEquals("pug1", map.get("tater").get("type"));
@@ -54,7 +55,7 @@ public class QuotedKeysTest {
   
   @Test
   public void should_convert_quoted_keys_to_map_but_not_to_object_fields() throws Exception {
-    Quoted quoted = new Toml().read("\"ʎǝʞ\" = \"value\"  \n[map]  \n  \"ʎǝʞ\" = \"value\"").to(Quoted.class);
+    Quoted quoted = new Toml().read("\"ʎǝʞ\" = \"value\"  \n[map]  \n  \"ʎǝʞ\" = \"value\"").to(new ObjectMapper(), Quoted.class);
     
     assertNull(quoted.ʎǝʞ);
     assertEquals("value", quoted.map.get("\"ʎǝʞ\""));
